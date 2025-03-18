@@ -1,0 +1,8 @@
+pipex
+file*
+.obj/
+.gdb_history
+compile_commands.json
+file1
+file4
+file4
