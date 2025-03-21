@@ -24,11 +24,10 @@ int	fill_cmds(t_data *ptr_data, int argc, char **argv)
 	ptr_data->cmds = ft_calloc((ptr_data->nb_cmds + 1), sizeof(char **));
 	if (ptr_data->cmds == NULL)
 		return (ERROR_MALLOC);
-	ptr_data->cmds[ptr_data->nb_cmds] = NULL;
 	i = 0;
 	while (i < ptr_data->nb_cmds)
 	{
-		ptr_data->cmds[i] = ft_split(argv[2], WHITE_SPACE);
+		ptr_data->cmds[i] = ft_split(argv[i + 2], WHITE_SPACE);
 		if (ptr_data->cmds[i] == NULL)
 		{
 			free_all(ptr_data->cmds);
