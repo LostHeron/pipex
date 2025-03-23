@@ -23,7 +23,7 @@ int	main(int argc, char **argv, char **env)
 	t_data	data;
 	int		ret;
 
-	if (argc < 5)
+	if (argc < 4)
 	{
 		ft_printf_fd(1, "wrong number of arguments\n");
 		ft_printf_fd(1, "usage : ./pipex arg1 arg2 arg3 arg4");

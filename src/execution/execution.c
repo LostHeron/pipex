@@ -13,8 +13,10 @@
 #include "pipex.h"
 #include "execution.h"
 #include "ft_io.h"
+#include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <sys/wait.h>
 
 int	execution(t_data *ptr_data, char **env)
 {
@@ -37,16 +39,16 @@ int	execution(t_data *ptr_data, char **env)
 			pid = fork();
 			if (pid == -1)
 			{
-				ft_printf_fd(1, "error while forking\n");
+				dprintf(1, "error while forking\n");
 				return (ERROR_FORK);
 			}
 			if (pid != 0)
-				ft_printf_fd(1, "fork succesfully created !\n");
+				dprintf(2, "fork succesfully created !, child of id %i created\n", pid);
 		}
 		if (pid == 0)
 		{
 			ret = child_execution(i, ptr_data, env, fd1, fd2);
-			ft_printf_fd(2, "ERROR in EXEVE\n");
+			dprintf(2, "ERROR in EXEVE\n");
 			/*
 			if (ret != 0)
 			{
@@ -54,7 +56,7 @@ int	execution(t_data *ptr_data, char **env)
 				exit (ret);
 			}
 			*/
-			exit(1);
+			exit(ret);
 		}
 		else
 		{
@@ -67,5 +69,16 @@ int	execution(t_data *ptr_data, char **env)
 	}
 	close(fd1[0]);
 	close(fd1[1]);
+	close(ptr_data->fd_infile);
+	close(ptr_data->fd_outfile);
+	int wait_pid;
+	while ((wait_pid = waitpid(-1, NULL, WNOHANG)) != -1)
+	{
+		if (wait_pid == 0)
+			printf("waiting for a child\n");
+		else
+			printf("waited for child with id : %i\n", wait_pid);
+		usleep(100000);
+	}
 	return (0);
 }
