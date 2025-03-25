@@ -9,6 +9,7 @@ LIBFT := $(addprefix $(LIBFT_DIR),$(LIBFT_FILE))
 EXECUTION_DIR := src/execution/
 EXECUTION_FILES := execution.c \
 				   child_execution.c \
+				   child_execution_utils.c \
 
 FILL_DATA_DIR := src/fill_data/
 FILL_DATA_FILES := fill_data.c \
@@ -16,9 +17,13 @@ FILL_DATA_FILES := fill_data.c \
 				   fill_paths.c \
 				   opening_files.c \
 
+FREEING_DIR := src/freeing/
+FREEING_FILES := free_data.c \
+
 C_FILES = pipex.c \
 		  $(addprefix $(FILL_DATA_DIR),$(FILL_DATA_FILES)) \
 		  $(addprefix $(EXECUTION_DIR),$(EXECUTION_FILES)) \
+		  $(addprefix $(FREEING_DIR),$(FREEING_FILES)) \
 
 OBJ_DIR := .obj/
 OBJ_FILES := $(addprefix $(OBJ_DIR),$(C_FILES:.c=.o))
@@ -35,13 +40,16 @@ $(NAME): $(OBJ_FILES) $(LIBFT)
 makelibft:
 	$(MAKE) -C $(LIBFT_DIR)
 
-$(OBJ_DIR)%.o:%.c | $(OBJ_DIR)$(FILL_DATA_DIR) $(OBJ_DIR)$(EXECUTION_DIR)
+$(OBJ_DIR)%.o:%.c | $(OBJ_DIR)$(FILL_DATA_DIR) $(OBJ_DIR)$(EXECUTION_DIR) $(OBJ_DIR)$(FREEING_DIR)
 	$(CC) -c $(CFLAGS) $(INCLUDES) $< -o $@
 
 $(OBJ_DIR)$(EXECUTION_DIR):
 	mkdir -p $@
 
 $(OBJ_DIR)$(FILL_DATA_DIR):
+	mkdir -p $@
+
+$(OBJ_DIR)$(FREEING_DIR):
 	mkdir -p $@
 
 clean:
