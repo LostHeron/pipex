@@ -19,7 +19,7 @@
 
 static int	find_commands(int i, t_data *ptr_data, char **env, char **cmd_path);
 
-int	child_execution(int i, t_data *ptr_data, char **env, int *fd1, int *fd2)
+int	child_execution(int i, t_data *ptr_data, char **env, int (*fds)[2])
 {
 	int		ret;
 	char	*cmd_path;
@@ -27,10 +27,11 @@ int	child_execution(int i, t_data *ptr_data, char **env, int *fd1, int *fd2)
 	if (i == 0 && i == ptr_data->nb_cmds - 1)
 	{
 		dprintf(2, "case 1\n");
-		close(fd1[0]);
-		close(fd1[1]);
-		close(fd2[0]);
-		close(fd2[1]);
+		for (int k = 0; k < ptr_data->nb_cmds - 1 - 1; k++)
+		{
+			close(fds[k][0]);
+			close(fds[k][1]);
+		}
 		if (dup2(ptr_data->fd_infile, 0) == -1)
 			return (ERROR_DUP2);
 		if (dup2(ptr_data->fd_outfile, 1) == -1)
@@ -42,28 +43,34 @@ int	child_execution(int i, t_data *ptr_data, char **env, int *fd1, int *fd2)
 	{
 		dprintf(2, "case 2\n");
 		close(ptr_data->fd_outfile);
-		close(fd1[0]);
-		close(fd1[1]);
-		close(fd2[0]);
+		for (int k = 1; k < ptr_data->nb_cmds - 1; k++)
+		{
+			close(fds[k][0]);
+			close(fds[k][1]);
+		}
+		close(fds[i][0]);
 		if (dup2(ptr_data->fd_infile, 0) == -1)
 			return (ERROR_DUP2);
-		if (dup2(fd2[1] , 1) == -1)
+		if (dup2(fds[i][1] , 1) == -1)
 			return (ERROR_DUP2);
 		close(ptr_data->fd_infile);
-		close(fd2[1]);
+		close(fds[i][1]);
 	}
 	else if (i == ptr_data->nb_cmds - 1)
 	{
 		dprintf(2, "case 3\n");
 		close(ptr_data->fd_infile);
-		close(fd1[1]);
-		close(fd2[0]);
-		close(fd2[1]);
-		if (dup2(fd1[0] , 0) == -1)
+		for (int k = 0; k < ptr_data->nb_cmds - 1 - 1; k++)
+		{
+			close(fds[k][0]);
+			close(fds[k][1]);
+		}
+		close(fds[i - 1][1]);
+		if (dup2(fds[i - 1][0] , 0) == -1)
 			return (ERROR_DUP2);
 		if (dup2(ptr_data->fd_outfile, 1) == -1)
 			return (ERROR_DUP2);
-		close(fd1[0]);
+		close(fds[i - 1][0]);
 		close(ptr_data->fd_outfile);
 	}
 	else
@@ -71,14 +78,22 @@ int	child_execution(int i, t_data *ptr_data, char **env, int *fd1, int *fd2)
 		dprintf(2, "case 4\n");
 		close(ptr_data->fd_infile);
 		close(ptr_data->fd_outfile);
-		close(fd1[1]);
-		close(fd2[0]);
-		if (dup2(fd1[0], 0) == -1)
+		for (int k = 0; k < ptr_data->nb_cmds; k++)
+		{
+			if (k != i - 1 && k != i)
+			{
+				close(fds[k][0]);
+				close(fds[k][1]);
+			}
+		}
+		close(fds[i - 1][1]);
+		close(fds[i][0]);
+		if (dup2(fds[i - 1][0], 0) == -1)
 			return (ERROR_DUP2);
-		if (dup2(fd2[1], 1) == -1)
+		if (dup2(fds[i][1], 1) == -1)
 			return (ERROR_DUP2);
-		close(fd1[0]);
-		close(fd2[1]);
+		close(fds[i - 1][0]);
+		close(fds[i][1]);
 	}
 	ret = find_commands(i, ptr_data, env, &cmd_path);
 	if (ret != 0)

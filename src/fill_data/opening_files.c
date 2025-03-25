@@ -18,7 +18,7 @@ int	opening_files(t_data *ptr_data, char *file1, char *file2)
 	int	ret;
 
 	ret = 0;
-	ptr_data->fd_infile = open(file1, O_RDONLY | O_CREAT, 0666);
+	ptr_data->fd_infile = open(file1, O_RDONLY, 0666);
 	if (ptr_data->fd_infile == -1)
 	{
 		ret = -1;

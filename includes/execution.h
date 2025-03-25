@@ -15,7 +15,7 @@
 
 # include "pipex.h"
 
-int	child_execution(int i, t_data *ptr_data, char **env, int *fd1, int *fd2);
+int	child_execution(int i, t_data *ptr_data, char **env, int (*fds)[2]);
 int	execution(t_data *ptr_data, char **env);
 
 #endif
