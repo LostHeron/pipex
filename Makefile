@@ -8,6 +8,7 @@ LIBFT := $(addprefix $(LIBFT_DIR),$(LIBFT_FILE))
 
 EXECUTION_DIR := src/execution/
 EXECUTION_FILES := execution.c \
+				   execution_utils.c \
 				   child_execution.c \
 				   child_execution_utils.c \
 

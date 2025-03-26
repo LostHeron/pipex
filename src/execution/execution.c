@@ -6,67 +6,94 @@
 /*   By: jweber <jweber@student.42Lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/18 16:50:50 by jweber            #+#    #+#             */
-/*   Updated: 2025/03/25 21:59:48 by jweber           ###   ########.fr       */
+/*   Updated: 2025/03/26 20:08:07 by jweber           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 #include "execution.h"
+#include "freeing.h"
 #include "ft_io.h"
-#include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/wait.h>
+#include <string.h>
+#include <errno.h>
+
+static void	create_process(int i, t_data *ptr_data, int *p_pid, t_fds *ptr_fds);
+static void	child_and_failure(int i, t_data *ptr_data, char **env, t_fds fds);
+static void	create_fork(int i, t_data *ptr_data, t_fds *ptr_fds, int *p_pid);
 
 int	execution(t_data *ptr_data, char **env)
 {
 	t_fds	fds;
 	int		pid;
 	int		i;
-	int		ret;
-	int		wait_id;
 
 	pid = 1;
 	i = 0;
 	if (pipe(fds.fd1) == -1)
-		return (ERROR_PIPE);
+	{
+		free_data(*ptr_data);
+		exit(ERROR_PIPE);
+	}
 	while (i < ptr_data->nb_cmds)
 	{
 		if (pid != 0)
-		{
-			if (pipe(fds.fd2) == -1)
-				return (ERROR_PIPE);
-			pid = fork();
-			if (pid == -1)
-				return (ERROR_FORK);
-		}
+			create_process(i, ptr_data, &pid, &fds);
 		if (pid == 0)
-		{
-			ret = child_execution(i, ptr_data, env, fds);
-			/*
-			if (ret != 0)
-			{
-				// should clear stuff here !
-				exit (ret);
-			}
-			*/
-			exit(ret);
-		}
+			child_and_failure(i, ptr_data, env, fds);
 		else
-		{
-			close(fds.fd1[0]);
-			close(fds.fd1[1]);
-			fds.fd1[0] = fds.fd2[0];
-			fds.fd1[1] = fds.fd2[1];
-		}
+			swap_fds(&fds);
 		i++;
 	}
-	close(fds.fd1[0]);
-	close(fds.fd1[1]);
-	close(ptr_data->fd_infile);
-	close(ptr_data->fd_outfile);
-	wait_id = 1;
-	while (wait_id != -1)
-		wait_id = wait(NULL);
+	close_end(fds);
+	wait_childs();
 	return (0);
+}
+
+static void	child_and_failure(int i, t_data *ptr_data, char **env, t_fds fds)
+{
+	int	ret;
+
+	ret = child_execution(i, ptr_data, env, fds);
+	close_all(ptr_data, fds);
+	free_data(*ptr_data);
+	exit(ret);
+}
+
+static void	create_process(int i, t_data *ptr_data, int *p_pid, t_fds *ptr_fds)
+{
+	if (pipe(ptr_fds->fd2) == -1)
+	{
+		ft_printf_fd(2, "errno: %s", strerror(errno));
+		if (close(ptr_fds->fd1[0]) == -1)
+			ft_printf_fd(2, "errno: %s", strerror(errno));
+		if (close(ptr_fds->fd1[1]) == -1)
+			ft_printf_fd(2, "errno: %s", strerror(errno));
+		free_data(*ptr_data);
+		exit(ERROR_PIPE);
+	}
+	create_fork(i, ptr_data, ptr_fds, p_pid);
+}
+
+static void	create_fork(int i, t_data *ptr_data, t_fds *ptr_fds, int *p_pid)
+{
+	if (((i == 0 && ptr_data->fd_infile == -1)
+			|| (i == ptr_data->nb_cmds - 1 && ptr_data->fd_outfile == -1)))
+		*p_pid = 1;
+	else
+	{
+		*p_pid = fork();
+		if (*p_pid == -1)
+		{
+			ft_printf_fd(2, "%s", strerror(errno));
+			if (close(ptr_fds->fd1[0]) == -1)
+				ft_printf_fd(2, "%s", strerror(errno));
+			if (close(ptr_fds->fd1[1]) == -1)
+				ft_printf_fd(2, "%s", strerror(errno));
+			free_data(*ptr_data);
+			exit(ERROR_FORK);
+		}
+	}
 }

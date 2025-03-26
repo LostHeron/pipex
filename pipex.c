@@ -6,7 +6,7 @@
 /*   By: jweber <jweber@student.42Lyon.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/18 15:12:57 by jweber            #+#    #+#             */
-/*   Updated: 2025/03/25 22:10:38 by jweber           ###   ########.fr       */
+/*   Updated: 2025/03/26 19:58:44 by jweber           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,15 +25,15 @@ int	main(int argc, char **argv, char **env)
 
 	if (argc < 4) // a remplacer par != 5 pour les non bonus !!
 	{
-		ft_printf_fd(1, "wrong number of arguments\n");
-		ft_printf_fd(1, "usage : ./pipex arg1 arg2 arg3 arg4");
+		ft_printf_fd(2, "wrong number of arguments\n");
+		ft_printf_fd(2, "usage : ./pipex arg1 arg2 arg3 arg4");
 		return (1);
 	}
 	data.paths = NULL;
 	data.cmds = NULL;
 	ret = fill_data(&data, argc, argv, env);
 	if (ret != 0)
-		return (0);
+		return (ret);
 	ret = execution(&data, env);
 	free_data(data);
 	return (0);
