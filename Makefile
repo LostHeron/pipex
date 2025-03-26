@@ -40,6 +40,9 @@ $(NAME): $(OBJ_FILES) $(LIBFT)
 makelibft:
 	$(MAKE) -C $(LIBFT_DIR)
 
+git:
+	git submodule update --init --remote --recursive
+
 $(OBJ_DIR)%.o:%.c | $(OBJ_DIR)$(FILL_DATA_DIR) $(OBJ_DIR)$(EXECUTION_DIR) $(OBJ_DIR)$(FREEING_DIR)
 	$(CC) -c $(CFLAGS) $(INCLUDES) $< -o $@
 
