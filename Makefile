@@ -19,6 +19,9 @@ FILL_DATA_FILES := fill_data.c \
 
 FREEING_DIR := src/freeing/
 FREEING_FILES := free_data.c \
+				 free_paths.c \
+				 free_cmds.c \
+				 close_all.c \
 
 C_FILES = pipex.c \
 		  $(addprefix $(FILL_DATA_DIR),$(FILL_DATA_FILES)) \
@@ -26,6 +29,7 @@ C_FILES = pipex.c \
 		  $(addprefix $(FREEING_DIR),$(FREEING_FILES)) \
 
 OBJ_DIR := .obj/
+OBJ_DIR_DEBUG := .obj_debug/
 OBJ_FILES := $(addprefix $(OBJ_DIR),$(C_FILES:.c=.o))
 
 INCLUDES := -I $(LIBFT_DIR)includes/  -I includes/
@@ -79,6 +83,16 @@ re_pipex:
 	$(MAKE) fclean_pipex
 	$(MAKE) all
 
-
 debug:
-	$(MAKE) CFLAGS="$(CFLAGS) -g3"
+	$(MAKE) OBJ_DIR="$(OBJ_DIR_DEBUG)" CFLAGS="$(CFLAGS) -g3"
+
+clean_debug:
+	rm -rf $(OBJ_DIR_DEBUG);
+
+fclean_debug:
+	$(MAKE) clean_debug
+	rm -rf $(NAME)
+
+re_debug:
+	$(MAKE) fclean_debug
+	$(MAKE) debug
