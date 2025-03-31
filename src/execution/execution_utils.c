@@ -10,18 +10,18 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
+#include <stdio.h>
 #include "execution.h"
 #include "ft_io.h"
 #include <unistd.h>
 #include <sys/wait.h>
-#include <string.h>
-#include <errno.h>
 
 void	swap_fds(t_fds *ptr_fds)
 {
-	close(ptr_fds->fd1[0]);
-	close(ptr_fds->fd1[1]);
+	if (close(ptr_fds->fd1[0]) == -1)
+		perror("close(ptr_fds->fd1[0])");
+	if (close(ptr_fds->fd1[1]) == -1)
+		perror("close(ptr_fds->fd1[1])");
 	ptr_fds->fd1[0] = ptr_fds->fd2[0];
 	ptr_fds->fd1[1] = ptr_fds->fd2[1];
 }
@@ -29,16 +29,32 @@ void	swap_fds(t_fds *ptr_fds)
 void	close_end(t_fds fds)
 {
 	if (close(fds.fd1[0]) == -1)
-		ft_printf_fd(2, "errno: %s\n", strerror(errno));
+		perror("close(fds.fd1[0]))");
 	if (close(fds.fd1[1]) == -1)
-		ft_printf_fd(2, "errno: %s\n", strerror(errno));
+		perror("close(fds.fd1[1]))");
 }
 
-void	wait_childs(void)
+int	wait_childs(int pid, int fd_outfile)
 {
 	int	wait_id;
+	int	status;
+	int	ret;
 
 	wait_id = 1;
 	while (wait_id != -1)
-		wait_id = wait(NULL);
+	{
+		wait_id = wait(&status);
+		if (wait_id == pid)
+		{
+			if (WIFEXITED(status) != 0)
+				ret = WEXITSTATUS(status);
+			else if (WIFSIGNALED(status) != 0)
+				ret = WTERMSIG(status) + 128;
+			else
+				ft_printf_fd(2, "child was not terminated normally\n");
+		}
+	}
+	if (fd_outfile == -1)
+		return (1);
+	return (ret);
 }

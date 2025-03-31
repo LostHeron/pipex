@@ -23,10 +23,10 @@ int	main(int argc, char **argv, char **env)
 	t_data	data;
 	int		ret;
 
-	if (argc < 4) // a remplacer par != 5 pour les non bonus !!
+	if (argc != 5)
 	{
 		ft_printf_fd(2, "wrong number of arguments\n");
-		ft_printf_fd(2, "usage : ./pipex arg1 arg2 arg3 arg4");
+		ft_printf_fd(2, "usage : ./pipex arg1 arg2 arg3 arg4\n");
 		return (1);
 	}
 	data.paths = NULL;
@@ -36,5 +36,5 @@ int	main(int argc, char **argv, char **env)
 		return (ret);
 	ret = execution(&data, env);
 	free_data(data);
-	return (0);
+	return (ret);
 }

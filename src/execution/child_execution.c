@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include <unistd.h>
+#include "freeing.h"
 #include "ft_string.h"
 #include "execution.h"
 #include "pipex.h"
@@ -20,6 +21,8 @@
 
 static int	find_commands(int i, t_data *ptr_data, char **p_cmd_path);
 static int	try_raw_cmd(int i, t_data *ptr_data, char **p_cmd_path);
+static int	printerr_and_ret(t_data *ptr_data, char *cmd_path);
+static int	ret_and_free(char *cmd_path, int ret);
 
 int	child_execution(int i, t_data *ptr_data, char **env, t_fds fds)
 {
@@ -38,14 +41,12 @@ int	child_execution(int i, t_data *ptr_data, char **env, t_fds fds)
 	if (ret != 0)
 	{
 		if (ret == 1)
-		{
-			ft_printf_fd(2, "command not found : %s\n", ptr_data->cmds[i][0]);
-			return (ret);
-		}
+			printerr_and_ret(ptr_data, cmd_path);
 		else
-			return (ret);
+			return (ret_and_free(cmd_path, ret));
 	}
 	execve(cmd_path, ptr_data->cmds[i], env);
+	perror(cmd_path);
 	free(cmd_path);
 	return (0);
 }
@@ -55,38 +56,60 @@ static int	find_commands(int i, t_data *ptr_data, char **p_cmd_path)
 	int	path_i;
 	int	ret;
 
-	if (ptr_data->cmds[i][0][0] == '/')
+	ret = 1;
+	if (ptr_data->cmds[i][0] != NULL)
 	{
-		*p_cmd_path = ft_strdup(ptr_data->cmds[i][0]);
-		if (*p_cmd_path == NULL)
-			return (ERROR_MALLOC);
-		return (0);
-	}
-	path_i = 0;
-	while (ptr_data->paths[path_i] != 0)
-	{
-		*p_cmd_path = ft_strjoin(ptr_data->paths[path_i], ptr_data->cmds[i][0]);
-		if (*p_cmd_path == NULL)
-			return (ERROR_MALLOC);
-		if (access(*p_cmd_path, X_OK) == 0)
+		if (ptr_data->cmds[i][0][0] == '/')
+		{
+			*p_cmd_path = ft_strdup(ptr_data->cmds[i][0]);
+			if (*p_cmd_path == NULL)
+				return (ERROR_MALLOC);
 			return (0);
-		free(*p_cmd_path);
-		path_i++;
+		}
+		path_i = 0;
+		while (ptr_data->paths[path_i] != 0)
+		{
+			*p_cmd_path = ft_strjoin(ptr_data->paths[path_i], ptr_data->cmds[i][0]);
+			if (*p_cmd_path == NULL)
+				return (ERROR_MALLOC);
+			if (access(*p_cmd_path, F_OK) == 0)
+				return (0);
+			free(*p_cmd_path);
+			path_i++;
+		}
+		ret = try_raw_cmd(i, ptr_data, p_cmd_path);
+		return (ret);
 	}
-	ret = try_raw_cmd(i, ptr_data, p_cmd_path);
-	if (ret == 0)
-		return (0);
-	return (1);
+	else
+	{
+		*p_cmd_path = ft_strdup("");
+		if (*p_cmd_path == NULL)
+			return (ERROR_MALLOC);
+		return (1);
+	}
 }
 
 int	try_raw_cmd(int i, t_data *ptr_data, char **p_cmd_path)
 {
-	if (access(ptr_data->cmds[i][0], X_OK))
-	{
-		*p_cmd_path = ft_strdup(ptr_data->cmds[i][0]);
-		if (*p_cmd_path == NULL)
-			return (ERROR_MALLOC);
+	*p_cmd_path = ft_strdup(ptr_data->cmds[i][0]);
+	if (*p_cmd_path == NULL)
+		return (ERROR_MALLOC);
+	if (access(ptr_data->cmds[i][0], X_OK) == 0)
 		return (0);
-	}
 	return (1);
+}
+
+static int	printerr_and_ret(t_data *ptr_data, char *cmd_path)
+{
+	ft_printf_fd(2, "command not found: %s\n", cmd_path);
+	free_cmds(ptr_data->cmds);
+	free_paths(ptr_data->paths);
+	free(cmd_path);
+	exit(127);
+}
+
+static int	ret_and_free(char *cmd_path, int ret)
+{
+	free(cmd_path);
+	return (ret);
 }

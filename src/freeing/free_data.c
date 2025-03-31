@@ -19,10 +19,10 @@ void	free_data(t_data data)
 {
 	if (data.fd_infile != -1)
 		if (close(data.fd_infile) == -1)
-			perror(NULL);
+			perror("close(data.fd_infile)");
 	if (data.fd_outfile != -1)
 		if (close(data.fd_outfile) == -1)
-			perror(NULL);
+			perror("close(data.fd_outfile)");
 	free_paths(data.paths);
 	free_cmds(data.cmds);
 }

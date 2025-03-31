@@ -29,6 +29,6 @@ int		one_pipe(t_data *ptr_data, t_fds fds);
 int		execution(t_data *ptr_data, char **env);
 void	swap_fds(t_fds *ptr_fds);
 void	close_end(t_fds fds);
-void	wait_childs(void);
+int		wait_childs(int pid, int fd_outfile);
 
 #endif

@@ -13,12 +13,10 @@
 #include "pipex.h"
 #include "execution.h"
 #include "freeing.h"
-#include "ft_io.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/wait.h>
-#include <string.h>
-#include <errno.h>
+#include <stdio.h>
 
 static void	create_process(int i, t_data *ptr_data, int *p_pid, t_fds *ptr_fds);
 static void	child_and_failure(int i, t_data *ptr_data, char **env, t_fds fds);
@@ -48,8 +46,7 @@ int	execution(t_data *ptr_data, char **env)
 		i++;
 	}
 	close_end(fds);
-	wait_childs();
-	return (0);
+	return (wait_childs(pid, ptr_data->fd_outfile));
 }
 
 static void	child_and_failure(int i, t_data *ptr_data, char **env, t_fds fds)
@@ -57,8 +54,8 @@ static void	child_and_failure(int i, t_data *ptr_data, char **env, t_fds fds)
 	int	ret;
 
 	ret = child_execution(i, ptr_data, env, fds);
-	close_all(ptr_data, fds);
-	free_data(*ptr_data);
+	free_cmds(ptr_data->cmds);
+	free_paths(ptr_data->paths);
 	exit(ret);
 }
 
@@ -66,11 +63,11 @@ static void	create_process(int i, t_data *ptr_data, int *p_pid, t_fds *ptr_fds)
 {
 	if (pipe(ptr_fds->fd2) == -1)
 	{
-		ft_printf_fd(2, "errno: %s", strerror(errno));
+		perror("pipe(ptr_fds->fd2)");
 		if (close(ptr_fds->fd1[0]) == -1)
-			ft_printf_fd(2, "errno: %s", strerror(errno));
+			perror("close(ptr_fds->fd1[0])");
 		if (close(ptr_fds->fd1[1]) == -1)
-			ft_printf_fd(2, "errno: %s", strerror(errno));
+			perror("close(ptr_fds->fd1[1])");
 		free_data(*ptr_data);
 		exit(ERROR_PIPE);
 	}
@@ -87,11 +84,11 @@ static void	create_fork(int i, t_data *ptr_data, t_fds *ptr_fds, int *p_pid)
 		*p_pid = fork();
 		if (*p_pid == -1)
 		{
-			ft_printf_fd(2, "%s", strerror(errno));
+			perror("fork():");
 			if (close(ptr_fds->fd1[0]) == -1)
-				ft_printf_fd(2, "%s", strerror(errno));
+				perror("close(ptr_fds->fd1[0])");
 			if (close(ptr_fds->fd1[1]) == -1)
-				ft_printf_fd(2, "%s", strerror(errno));
+				perror("close(ptr_fds->fd1[1])");
 			free_data(*ptr_data);
 			exit(ERROR_FORK);
 		}

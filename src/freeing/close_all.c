@@ -27,7 +27,7 @@ int	close_all(t_data *ptr_data, t_fds fds)
 	{
 		if (close(ptr_data->fd_infile) == -1)
 		{
-			perror("ptr_data->fd_infile");
+			perror("close(ptr_data->fd_infile)");
 			ret += 16;
 		}
 	}
@@ -35,7 +35,7 @@ int	close_all(t_data *ptr_data, t_fds fds)
 	{
 		if (close(ptr_data->fd_outfile) == -1)
 		{
-			perror("ptr_data->fd_outfile");
+			perror("close(ptr_data->fd_outfile)");
 			ret += 32;
 		}
 	}
@@ -46,22 +46,22 @@ static void	close_fds(t_fds fds, int *ret)
 {
 	if (close(fds.fd1[0]) == -1)
 	{
-		perror("fds.fd1[0]");
+		perror("close(fds.fd1[0])");
 		*ret += 1;
 	}
 	if (close(fds.fd1[1]) == -1)
 	{
-		perror("fds.fd1[1]");
+		perror("close(fds.fd1[1])");
 		*ret += 2;
 	}
 	if (close(fds.fd2[0]) == -1)
 	{
-		perror("fds.fd2[0]");
+		perror("close(fds.fd2[0])");
 		*ret += 4;
 	}
 	if (close(fds.fd2[1]) == -1)
 	{
-		perror("fds.fd2[1]");
+		perror("close(fds.fd2[1])");
 		*ret += 8;
 	}
 }

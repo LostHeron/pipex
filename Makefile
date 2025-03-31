@@ -88,6 +88,7 @@ debug:
 	$(MAKE) OBJ_DIR="$(OBJ_DIR_DEBUG)" CFLAGS="$(CFLAGS) -g3"
 
 clean_debug:
+	$(MAKE) -C $(LIBFT_DIR) OBJ_DIR=$(OBJ_DIR_DEBUG) clean 
 	rm -rf $(OBJ_DIR_DEBUG);
 
 fclean_debug:

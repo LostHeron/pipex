@@ -12,6 +12,7 @@
 
 #include "execution.h"
 #include "freeing.h"
+#include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
 
@@ -23,9 +24,15 @@ int	one_pipe(t_data *ptr_data, t_fds fds)
 	{
 		ret = 0;
 		if (dup2(ptr_data->fd_infile, 0) == -1)
+		{
+			perror("dup2(ptr_data->fd_infile, 0)");
 			ret = ERROR_DUP2;
+		}
 		if (dup2(ptr_data->fd_outfile, 1) == -1)
+		{
+			perror("dup2(ptr_data->fd_infile, 0)");
 			ret = ERROR_DUP2;
+		}
 		close_all(ptr_data, fds);
 		return (ret);
 	}
@@ -45,9 +52,15 @@ int	first_pipe(t_data *ptr_data, t_fds fds)
 	{
 		ret = 0;
 		if (dup2(ptr_data->fd_infile, 0) == -1)
+		{
+			perror("dup2(ptr_data->fd_infile, 0)");
 			ret = ERROR_DUP2;
+		}
 		if (dup2(fds.fd2[1], 1) == -1)
+		{
+			perror("dup2(fds.fd2[1], 1)");
 			ret = ERROR_DUP2;
+		}
 		close_all(ptr_data, fds);
 		return (ret);
 	}
@@ -67,9 +80,15 @@ int	last_pipe(t_data *ptr_data, t_fds fds)
 	{
 		ret = 0;
 		if (dup2(fds.fd1[0], 0) == -1)
+		{
+			perror("dup2(fds.fd1[0], 0)");
 			ret = ERROR_DUP2;
+		}
 		if (dup2(ptr_data->fd_outfile, 1) == -1)
+		{
+			perror("dup2(ptr_data->fd_outfile, 1)");
 			ret = ERROR_DUP2;
+		}
 		close_all(ptr_data, fds);
 		return (ret);
 	}
@@ -87,9 +106,15 @@ int	middle_pipe(t_data *ptr_data, t_fds fds)
 
 	ret = 0;
 	if (dup2(fds.fd1[0], 0) == -1)
+	{
+		perror("dup2(fds.fd1[0], 0)");
 		ret = ERROR_DUP2;
+	}
 	if (dup2(fds.fd2[1], 1) == -1)
+	{
+		perror("dup2(fds.fd2[1], 1)");
 		ret = ERROR_DUP2;
+	}
 	close_all(ptr_data, fds);
 	return (ret);
 }
