@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <unistd.h>
 #include "ft_string.h"
 #include "execution.h"
 #include "pipex.h"

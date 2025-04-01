@@ -15,7 +15,6 @@
 #include "freeing.h"
 #include <unistd.h>
 #include <stdlib.h>
-#include <sys/wait.h>
 #include <stdio.h>
 
 static void	create_process(int i, t_data *ptr_data, int *p_pid, t_fds *ptr_fds);
