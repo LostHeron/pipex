@@ -122,7 +122,7 @@ int	middle_pipe(t_data *ptr_data, t_fds fds)
 
 int	printerr_and_ret(t_data *ptr_data, char *cmd_path)
 {
-	ft_printf_fd(2, "command not found: %s\n", cmd_path);
+	ft_printf_fd(2, "%s: command not found\n", cmd_path);
 	free_cmds(ptr_data->cmds);
 	free_paths(ptr_data->paths);
 	free(cmd_path);
