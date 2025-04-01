@@ -10,13 +10,11 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <unistd.h>
 #include <stdlib.h>
 #include "execution.h"
-#include "ft_io.h"
-#include "pipex.h"
-#include "fill_data.h"
 #include "freeing.h"
+#include "ft_io.h"
+#include "fill_data.h"
 
 int	main(int argc, char **argv, char **env)
 {
