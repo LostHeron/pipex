@@ -32,6 +32,7 @@ C_FILES = pipex.c \
 OBJ_DIR := .obj/
 OBJ_DIR_DEBUG := .obj_debug/
 OBJ_FILES := $(addprefix $(OBJ_DIR),$(C_FILES:.c=.o))
+D_FILES := $(OBJ_FILES:.o=.d)
 
 INCLUDES := -I $(LIBFT_DIR)includes/  -I includes/
 
@@ -48,8 +49,10 @@ makelibft:
 git:
 	git submodule update --init --remote --recursive
 
+-include $(D_FILES)
+
 $(OBJ_DIR)%.o:%.c | $(OBJ_DIR)$(FILL_DATA_DIR) $(OBJ_DIR)$(EXECUTION_DIR) $(OBJ_DIR)$(FREEING_DIR)
-	$(CC) -c $(CFLAGS) $(INCLUDES) $< -o $@
+	$(CC) -c $(CFLAGS) -MMD -MP $(INCLUDES) $< -o $@
 
 $(OBJ_DIR)$(EXECUTION_DIR):
 	mkdir -p $@
