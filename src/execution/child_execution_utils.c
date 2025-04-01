@@ -12,6 +12,7 @@
 
 #include "execution.h"
 #include "freeing.h"
+#include "ft_io.h"
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -117,4 +118,13 @@ int	middle_pipe(t_data *ptr_data, t_fds fds)
 	}
 	close_all(ptr_data, fds);
 	return (ret);
+}
+
+int	printerr_and_ret(t_data *ptr_data, char *cmd_path)
+{
+	ft_printf_fd(2, "command not found: %s\n", cmd_path);
+	free_cmds(ptr_data->cmds);
+	free_paths(ptr_data->paths);
+	free(cmd_path);
+	exit(127);
 }

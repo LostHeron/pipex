@@ -22,6 +22,7 @@ typedef struct s_fds
 }	t_fds;
 
 int		child_execution(int i, t_data *ptr_data, char **env, t_fds fds);
+int		printerr_and_ret(t_data *ptr_data, char *cmd_path);
 int		middle_pipe(t_data *ptr_data, t_fds fds);
 int		last_pipe(t_data *ptr_data, t_fds fds);
 int		first_pipe(t_data *ptr_data, t_fds fds);
